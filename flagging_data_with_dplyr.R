@@ -22,12 +22,12 @@ ggplot(data, aes(carb)) +
   #that to check it later
 data <- data %>%
   mutate(data_flag = ifelse(carb > 5, #what to flag 
-                            "high_carb, ", #how to flag leave a comma for later
-                            data_flag)) #what to do with rows that don't meet that critera
+                            "high_carb, ", #write the flag code and inlude ", " at end so we 
+                                            #can add multiple flags later
+                            data_flag)) #what to do with rows that don't meet that critera - leave alone!
 
 #sometimes you want to look at specific relationships. Lets look at how much power a car has
-  #via ("cyl") and compare it to "mpg" to find potential values that are "too good to be
-  #true" for each cylinder group
+  #via ("cyl") and compare it to "mpg" to find potential values that are high in each cyl group
 ggplot(data, aes(x=cyl, y=mpg)) +
   geom_point()
 
@@ -38,8 +38,8 @@ data <- data %>%
   group_by(cyl) %>%
   mutate(best_mpg_by_cyl = dense_rank(-mpg)) %>% #helper column to sort (rank by highest)
   mutate(data_flag = ifelse(best_mpg_by_cyl >= 2, #what to flag 
-                            paste("high_mpg_by_cyl, ", data_flag), #how to flag
-                            data_flag)) %>% #what to do with rows that don't meet that critera
+                            paste(data_flag, "high_mpg_by_cyl, "), #use paste to flag over old flags
+                            data_flag)) %>% #rows that don't meet that critera
   select(-best_mpg_by_cyl) #drop the helper column
 
 
@@ -53,7 +53,7 @@ sub <- data %>%
   group_by(cyl)%>% 
   mutate(HpByCyl=dense_rank(hp)) 
   
-#let's say I want to double check "manipulated$HpByCyl" that is ranked <2 because that data 
+#let's say I want to double check the "HpByCyl" vector that is ranked <2 because that data 
   #is such low values that I suspect it could be errors. I'll do this by flagging the data 
   #so I can go into my source file and go through them case by case. 
 sub <- sub %>%
